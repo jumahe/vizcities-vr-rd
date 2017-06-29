@@ -169,7 +169,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 1 */
+/* 1 - World */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -210,6 +210,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _layerEnvironmentEnvironmentLayer2 = _interopRequireDefault(_layerEnvironmentEnvironmentLayer);
 
+	var _vr_controls = __webpack_require__(81); // jumahe
+	var _vr_controls2 = _interopRequireDefault(_vr_controls); // jumahe
+
 	// TODO: Make sure nothing is left behind in the heap after calling destroy()
 
 	// Pretty much any event someone using ViziCities would need will be emitted or
@@ -233,9 +236,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._layers = [];
 	    this._controls = [];
 
+			this._vr_controls = null; // jumahe
+			this._vr_test = true; // jumahe
+
 	    this._initContainer(domId);
 	    this._initAttribution();
 	    this._initEngine();
+			this._initVRControls();
 	    this._initEnvironment();
 	    this._initEvents();
 
@@ -272,6 +279,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Consider proxying these through events on World for public access
 	      // this._engine.on('preRender', () => {});
 	      // this._engine.on('postRender', () => {});
+	    }
+	  }, {
+	    key: '_initVRControls', // jumahe
+	    value: function _initVRControls() {
+	      this._vr_controls = new _vr_controls2['default'](this._container, this._engine._camera); // jumahe
 	    }
 	  }, {
 	    key: '_initEnvironment',
@@ -336,10 +348,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Once _update is called it will run forever, for now
 	      window.requestAnimationFrame(this._update.bind(this));
 
-	      // Update controls
-	      this._controls.forEach(function (controls) {
-	        controls.update(delta);
-	      });
+	      // Update controls -- TODO (jumahe): define if we are on mobile or desktop
+				this._controls.forEach(function (controls) {
+        	controls.update(delta);
+      	});
+
+				if(this._vr_controls !== null) this._vr_controls.update(delta); // jumahe
 
 	      this.emit('preUpdate', delta);
 	      this._engine.update(delta);
@@ -5601,7 +5615,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 38 */
+/* 38 - ORBIT CONTROL */
 /***/ function(module, exports, __webpack_require__) {
 
 	Object.defineProperty(exports, '__esModule', {
@@ -18697,7 +18711,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	{
 		console.log("vr manager init");
 		var manager = new WebVRManager(renderer, effect);
+
+		var updateSize = function updateSize()
+		{
+			manager.renderer.setSize(container.clientWidth,container.clientHeight);
+	  };
+
+	  window.addEventListener('resize', updateSize, false);
+	  updateSize();
+
 	  return manager;
+	};
+	;
+	module.exports = exports['default'];
+/***/ },
+/* 81 - VR CONTROLS (added by jumahe) */
+/***/ function(module, exports, __webpack_require__) {
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _three = __webpack_require__(10);
+	var _three2 = _interopRequireDefault(_three);
+
+	var _camera = __webpack_require__(19);
+	var _camera2 = _interopRequireDefault(_camera);
+
+	exports['default'] = function (container, camera)
+	{
+		console.log("vr control init");
+		var controls = new _three2['default'].VRControls(camera);
+
+		var update = function update(delta)
+		{
+      controls.update(delta);
+	  };
+
+	  return controls;
 	};
 	;
 	module.exports = exports['default'];
